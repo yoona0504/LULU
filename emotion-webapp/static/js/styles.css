@@ -1,0 +1,151 @@
+:root {
+    --bg: #0b0f14;
+    --card: #121822;
+    --muted: #7d8a98;
+    --accent: #4da3ff;
+}
+
+* {
+    box-sizing: border-box
+}
+
+body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Apple SD Gothic Neo, Malgun Gothic, sans-serif;
+    background: var(--bg);
+    color: #e6eef6
+}
+
+.wrap {
+    max-width: 1080px;
+    margin: 24px auto;
+    padding: 0 16px
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px
+}
+
+h1 {
+    font-size: 22px;
+    margin: 0
+}
+
+.badge {
+    background: #192333;
+    border: 1px solid #223047;
+    border-radius: 999px;
+    padding: 6px 10px;
+    color: #a7bed2;
+    font-size: 12px
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 16px
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid #1d2837;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, .25)
+}
+
+.card .hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #1d2837
+}
+
+.card .bd {
+    padding: 16px
+}
+
+.video {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid #243248
+}
+
+.hint {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 8px
+}
+
+.kv {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap
+}
+
+.kv .pill {
+    background: #0f1520;
+    border: 1px solid #243248;
+    border-radius: 999px;
+    padding: 4px 10px;
+    color: #a7bed2;
+    font-size: 12px
+}
+
+.meter {
+    display: flex;
+    flex-direction: column;
+    gap: 10px
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 96px 1fr 56px;
+    align-items: center;
+    gap: 10px
+}
+
+.label {
+    color: #cfe3f6;
+    font-size: 14px
+}
+
+.track {
+    height: 12px;
+    background: #0f1520;
+    border: 1px solid #243248;
+    border-radius: 999px;
+    overflow: hidden
+}
+
+.fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width .25s ease
+}
+
+.val {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: #b8cbe0
+}
+
+.log {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    color: #a7bed2;
+    font-size: 12px;
+    white-space: pre-wrap;
+    line-height: 1.5
+}
+
+@media (max-width:920px) {
+    .grid {
+        grid-template-columns: 1fr
+    }
+}

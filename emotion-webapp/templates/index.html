@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>루루봇 감정분석 데모</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>루루봇 감정분석</h1>
+    <span class="badge" id="status">연결 확인중…</span>
+  </header>
+
+  <div class="grid">
+    <!-- 영상 -->
+    <section class="card">
+      <div class="hd"><strong>실시간 영상</strong></div>
+      <div class="bd">
+        <div class="video">
+          <img id="cam" src="/video_feed" alt="camera" width="100%" />
+        </div>
+        <p class="hint">카메라 LED가 꺼져 있으면 다른 앱이 점유 중일 수 있어요.</p>
+      </div>
+    </section>
+
+    <!-- 분석 패널 -->
+    <section class="card">
+      <div class="hd"><strong>분석 결과</strong><span class="badge" id="topLabel">-</span></div>
+      <div class="bd">
+        <div class="kv">
+          <span class="pill">엔진: <b id="engine">자동 선택</b></span>
+          <span class="pill">FPS: <b id="fps">-</b></span>
+        </div>
+        <div class="meter" id="meters">
+          <!-- JS가 행 3개를 생성합니다 -->
+        </div>
+        <div class="hint" style="margin-top:8px">값은 0~100% 확률입니다.</div>
+        <div class="log" id="log" style="margin-top:12px">ready\n</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="/static/js/main.js"></script>
+</body>
+</html>
