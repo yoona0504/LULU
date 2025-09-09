@@ -17,7 +17,7 @@ if not cap.isOpened():
 # 감정 엔진 선택
 # -----------------------
 if FerEmotion is not None:
-    predictor = FerEmotion()
+    predictor = FerEmotion(alpha=0.65, conf_th=0.45, min_rel=0.10, out_mode="7")
     ENGINE_NAME = "fer"
 else:
     predictor = HeuristicEmotion()
@@ -132,6 +132,8 @@ def api_emotion():
         "emotions": last_emotions,
         "top": last_top,
     })
+    
+    print("[ENGINE]", ENGINE_NAME, "->", predictor.__class__.__name__)
 
 # -----------------------
 # 실행
