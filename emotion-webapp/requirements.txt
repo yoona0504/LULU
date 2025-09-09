@@ -5,4 +5,4 @@ fer
 moviepy
 mtcnn
 imageio-ffmpeg
-tensorflow<2.17
+tensorflow==2.16.2
