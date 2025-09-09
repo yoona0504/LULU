@@ -1,8 +1,7 @@
 import cv2
 import numpy as np
 
-EMOTIONS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
-
+EMOTIONS7 = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
 
 class HeuristicEmotion:
     def predict(self, face_bgr: np.ndarray) -> dict:
@@ -70,7 +69,7 @@ try:
             self.alpha = float(alpha)
             self.conf_th = float(conf_th)
             self.min_rel = float(min_rel)
-            self._ema = None  # np.array([happy, neutral, sad])
+            self._ema = None  # np.array([happy, neutral, sad]) 길이 3 고정
 
         def _ema_smooth(self, new_vec: np.ndarray) -> np.ndarray:
             if self._ema is None:
