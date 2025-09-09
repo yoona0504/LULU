@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-EMOTIONS = ["happy", "neutral", "sad"]
+EMOTIONS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
 
 
 class HeuristicEmotion:
