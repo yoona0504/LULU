@@ -17,7 +17,7 @@ if not cap.isOpened():
 # 감정 엔진 선택
 # -----------------------
 if FerEmotion is not None:
-    predictor = FerEmotion(alpha=0.65, conf_th=0.45, min_rel=0.10, out_mode="7")
+    predictor = FerEmotion(alpha=0.65, conf_th=0.60, min_rel=0.20)
     ENGINE_NAME = "fer"
 else:
     predictor = HeuristicEmotion()
