@@ -1,4 +1,4 @@
-const METER_KEYS = ["happy", "neutral", "sad"];
+let currentLabels = [];
 
 function $(id) { return document.getElementById(id); }
 
@@ -17,10 +17,11 @@ async function ping() {
   }
 }
 
-function buildMeters() {
+function buildMeters(labels) {
   const wrap = $("meters");
   wrap.innerHTML = "";
-  METER_KEYS.forEach((k) => {
+  currentLabels = labels;
+  labels.forEach((k) => {
     const row = document.createElement("div");
     row.className = "row";
     row.innerHTML = `
@@ -47,14 +48,19 @@ async function pollEmotion() {
     const data = await res.json();
 
     const probs = data.probs || {};
+    const labels = data.labels || Object.keys(probs);
     const label = data.label || "-";
     $("topLabel").textContent = label;
 
     // 엔진 힌트
-    $("engine").textContent = probs.angry !== undefined ? "FER(딥러닝)" : "Heuristic";
+    $("engine").textContent = labels.length > 3 ? "FER(딥러닝)" : "Heuristic";
 
-    // happy/neutral/sad만 우선 표시 (FER일 경우 없는 키는 0%)
-    METER_KEYS.forEach((k) => {
+    // 필요시 처음 한 번만 meter UI 빌드
+    if (currentLabels.length !== labels.length) {
+      buildMeters(labels);
+    }
+
+    labels.forEach((k) => {
       const v = Math.round(100 * (probs[k] || 0));
       const fill = $(`fill-${k}`);
       const val = $(`val-${k}`);
