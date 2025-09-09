@@ -1,2 +1,2 @@
-cd C:\yoona\emotion-webapp
+cd C:\LULU
 .\.venv\Scripts\activate
