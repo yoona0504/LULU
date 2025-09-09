@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-EMOTIONS7 = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
+EMOTIONS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
 
 class HeuristicEmotion:
     def predict(self, face_bgr: np.ndarray) -> dict:
