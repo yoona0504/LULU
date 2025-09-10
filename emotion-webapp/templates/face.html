@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}얼굴 인식{% endblock %}
+{% block content %}
+  <h3 class="mb-3">얼굴 인식</h3>
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <div class="card p-2">
+        <img id="cam" class="w-100" style="aspect-ratio:4/3; object-fit:cover;" src="/video_feed" />
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card p-3">
+        <h5>상태</h5>
+        <div id="status" class="muted">확인 중…</div>
+        <hr/>
+        <h6>최근 감정</h6>
+        <pre id="last" class="muted" style="white-space:pre-wrap;"></pre>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function tick(){
+  try{
+    const r = await fetch("/api/last"); const j = await r.json();
+    document.getElementById("status").textContent = "엔진: {{ ENGINE_NAME if ENGINE_NAME else '' }} / 연결 OK";
+    document.getElementById("last").textContent = JSON.stringify(j.data, null, 2) || "데이터 없음";
+  }catch(e){ document.getElementById("status").textContent = "오프라인"; }
+}
+setInterval(tick, 1500); tick();
+</script>
+{% endblock %}
