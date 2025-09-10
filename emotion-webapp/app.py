@@ -33,8 +33,23 @@ face_cascade = cv2.CascadeClassifier(
 # -----------------------
 last_emotions = {"neutral": 1.0}
 last_top = {"label": "neutral", "score": 1.0}
-fps_ma = deque(maxlen=30)  # 최근 30프레임 이동평균
+fps_ma = deque(maxlen=30)           # 최근 30프레임 이동평균
 last_time = time.time()
+
+# 멀티페이지 공용: 최근 기록 히스토리 (여러 페이지가 통계/차트로 사용)
+HIST_MAX = 200
+emotion_hist = deque(maxlen=HIST_MAX)  # [{t:int(ms), probs:dict, engine:str}]
+
+
+def _now_ms(): return int(time.time() * 1000)
+
+
+def _push_emotion_sample(probs: dict):
+    """히스토리에 샘플 추가"""
+    if not probs:
+        return
+    emotion_hist.append({"t": _now_ms(), "probs": probs, "engine": ENGINE_NAME})
+
 
 def _update_state(probs):
     """감정 확률과 top, FPS 이동평균을 업데이트"""
@@ -52,10 +67,12 @@ def _update_state(probs):
     if dt > 0:
         fps_ma.append(1.0 / dt)
 
+
 def _current_fps():
     if not fps_ma:
         return 0.0
     return sum(fps_ma) / len(fps_ma)
+
 
 # -----------------------
 # 비디오 프레임 생성
@@ -64,7 +81,7 @@ def gen_frames():
     while True:
         ok, frame = cap.read()
         if not ok:
-            # 카메라 끊김 방지: 빈 루프가 아닌 약간의 대기 후 계속 시도
+            # 카메라 끊김 방지: 약간 대기 후 재시도
             time.sleep(0.01)
             continue
 
@@ -82,7 +99,7 @@ def gen_frames():
             )
             if len(faces) > 0:
                 (x, y, w, h) = faces[0]
-                face = frame[y:y+h, x:x+w]
+                face = frame[y:y + h, x:x + w]
                 probs = predictor.predict(face)
                 # 시각화: 박스/라벨
                 top_label = max(probs, key=probs.get)
@@ -94,8 +111,9 @@ def gen_frames():
             else:
                 probs = {"neutral": 1.0}
 
-        # 대시보드용 상태 업데이트
+        # 대시보드용 상태/히스토리 업데이트
         _update_state(probs)
+        _push_emotion_sample(probs)
 
         # 스트림 인코딩
         ret, buffer = cv2.imencode(".jpg", frame)
@@ -107,14 +125,38 @@ def gen_frames():
             b"Content-Type: image/jpeg\r\n\r\n" + buffer.tobytes() + b"\r\n"
         )
 
+
 # -----------------------
-# 라우트
+# 페이지 라우트 (멀티페이지)
 # -----------------------
 @app.route("/")
-def index():
-    # templates/index.html 에 파일이 있어야 합니다.
-    return render_template("dashboard.html")
+def home():
+    return render_template("home.html", engine=ENGINE_NAME)
 
+@app.route("/face")
+def face_page():
+    return render_template("face.html", engine=ENGINE_NAME)
+
+@app.route("/emotion")
+def emotion_page():
+    return render_template("emotion.html", engine=ENGINE_NAME)
+
+@app.route("/persona")
+def persona_page():
+    return render_template("persona.html", engine=ENGINE_NAME)
+
+@app.route("/chat")
+def chat_page():
+    return render_template("chat.html", engine=ENGINE_NAME)
+
+@app.route("/offline")
+def offline_page():
+    return render_template("offline.html", engine=ENGINE_NAME)
+
+
+# -----------------------
+# 기존 스트림 & 호환 API
+# -----------------------
 @app.route("/video_feed")
 def video_feed():
     return Response(gen_frames(), mimetype="multipart/x-mixed-replace; boundary=frame")
@@ -125,15 +167,48 @@ def ping():
 
 @app.route("/api/emotion")
 def api_emotion():
-    """대시보드 폴링용 JSON"""
-    return jsonify({
+    """호환용: 최근 샘플 1개 + fps"""
+    resp = jsonify({
         "engine": ENGINE_NAME,
         "fps": round(_current_fps(), 2),
         "emotions": last_emotions,
         "top": last_top,
     })
-    
+    # 참고 로그
     print("[ENGINE]", ENGINE_NAME, "->", predictor.__class__.__name__)
+    return resp
+
+
+# -----------------------
+# 공용 데이터 API (여러 페이지에서 사용)
+# -----------------------
+@app.route("/api/last")
+def api_last():
+    """최근 샘플 1개"""
+    if len(emotion_hist) == 0:
+        return jsonify(ok=True, data=None)
+    return jsonify(ok=True, data=emotion_hist[-1])
+
+@app.route("/api/history")
+def api_history():
+    """최근 N개"""
+    return jsonify(ok=True, data=list(emotion_hist))
+
+@app.route("/api/summary")
+def api_summary():
+    """최근 평균/우세 감정 등 간단 통계"""
+    if len(emotion_hist) == 0:
+        return jsonify(ok=True, total=0, top=None, means={})
+    keys = list(next(iter(emotion_hist))["probs"].keys())
+    sums = {k: 0.0 for k in keys}
+    for rec in emotion_hist:
+        for k, v in rec["probs"].items():
+            sums[k] += float(v)
+    n = len(emotion_hist)
+    means = {k: (sums[k] / n) for k in keys}
+    top = max(means, key=means.get)
+    return jsonify(ok=True, total=n, top=top, means=means)
+
 
 # -----------------------
 # 실행
