@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}오프라인 대응{% endblock %}
+{% block content %}
+  <h3 class="mb-3">오프라인 대응</h3>
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <div class="card p-3">
+        <h6>감정별 로컬 반응(예시)</h6>
+        <ul class="mb-0">
+          <li>happy → 춤추기/LED 밝게</li>
+          <li>sad → 위로 멘트/LED 잔잔</li>
+          <li>angry → 진정 멘트/거리두기 모션</li>
+        </ul>
+        <p class="muted mt-2 mb-0">하드웨어 제어 함수에 매핑하세요.</p>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card p-3">
+        <h6>최근 평균</h6>
+        <pre id="avg" class="muted" style="white-space:pre-wrap;"></pre>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function tick(){
+  const s = await (await fetch("/api/summary")).json();
+  document.getElementById("avg").textContent = JSON.stringify(s.means || {}, null, 2);
+}
+setInterval(tick, 2000); tick();
+</script>
+{% endblock %}
