@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}루루봇 대시보드 · 홈{% endblock %}
+{% block content %}
+  <h2 class="mb-4">주요 기능</h2>
+  <div class="row g-3">
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100 p-3">
+        <h5>얼굴 인식</h5>
+        <p class="muted">얼굴을 인식해 주인을 확인</p>
+        <a href="/face" class="btn btn-primary">열기</a>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100 p-3">
+        <h5>감정 분석</h5>
+        <p class="muted">표정으로 감정 분석 및 기록</p>
+        <a href="/emotion" class="btn btn-primary">열기</a>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100 p-3">
+        <h5>성격 변화</h5>
+        <p class="muted">감정 기록을 통해 루루봇 성격 변화</p>
+        <a href="/persona" class="btn btn-primary">열기</a>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100 p-3">
+        <h5>AI 대화</h5>
+        <p class="muted">OpenAI API 연동 대화(맞춤 감정 톤)</p>
+        <a href="/chat" class="btn btn-primary">열기</a>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100 p-3">
+        <h5>오프라인 대응</h5>
+        <p class="muted">OpenAI 사용 데이터 기반 로컬 반응</p>
+        <a href="/offline" class="btn btn-primary">열기</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
