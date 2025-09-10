@@ -1,2 +1,5 @@
 cd C:\LULU
 .\.venv\Scripts\activate
+
+cd emotion-webapp
+python app.py
