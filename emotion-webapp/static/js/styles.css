@@ -1,151 +1,50 @@
+/* === Quick Theme Lift === */
 :root {
-    --bg: #0b0f14;
-    --card: #121822;
-    --muted: #7d8a98;
-    --accent: #4da3ff;
+  /* 기존보다 2~3스텝 밝게 */
+  --bg: #0f141d;     /* was #0b0f14 */
+  --card: #161e2b;   /* was #121822 */
+  --muted: #9fb1c5;  /* was #7d8a98 */
+  --accent: #4da3ff; /* 유지 but 더 선명하게 쓰도록 아래에서 강화 */
 }
 
-* {
-    box-sizing: border-box
-}
+/* 본문 기본 대비 살짝 ↑ */
+body { color: #f0f6ff; }
 
-body {
-    margin: 0;
-    font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Apple SD Gothic Neo, Malgun Gothic, sans-serif;
-    background: var(--bg);
-    color: #e6eef6
-}
-
-.wrap {
-    max-width: 1080px;
-    margin: 24px auto;
-    padding: 0 16px
-}
-
-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 16px
-}
-
-h1 {
-    font-size: 22px;
-    margin: 0
-}
-
-.badge {
-    background: #192333;
-    border: 1px solid #223047;
-    border-radius: 999px;
-    padding: 6px 10px;
-    color: #a7bed2;
-    font-size: 12px
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 16px
-}
-
+/* 카드 경계/그림자 살짝 강조 */
 .card {
-    background: var(--card);
-    border: 1px solid #1d2837;
-    border-radius: 16px;
-    box-shadow: 0 2px 16px rgba(0, 0, 0, .25)
+  border-color: #223047;        /* was #1d2837 */
+  box-shadow: 0 6px 24px rgba(0,0,0,.28);
 }
 
+/* 카드 헤더 라인도 조금 더 선명하게 */
 .card .hd {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 16px;
-    border-bottom: 1px solid #1d2837
+  border-bottom-color: #26354a; /* was #1d2837 */
 }
 
-.card .bd {
-    padding: 16px
-}
+/* 라벨/텍스트 대비 상승 */
+.label { color: #e6f0fb; }      /* was #cfe3f6 */
+.val   { color: #d0def0; }      /* was #b8cbe0 */
+.hint  { color: #a9bdd2; }      /* was var(--muted)보다 살짝 선명 */
 
-.video {
-    width: 100%;
-    overflow: hidden;
-    border-radius: 12px;
-    border: 1px solid #243248
-}
-
-.hint {
-    color: var(--muted);
-    font-size: 12px;
-    margin-top: 8px
-}
-
-.kv {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap
-}
-
+/* 칩(필) 대비 상승 */
 .kv .pill {
-    background: #0f1520;
-    border: 1px solid #243248;
-    border-radius: 999px;
-    padding: 4px 10px;
-    color: #a7bed2;
-    font-size: 12px
+  background: #111a28;          /* was #0f1520 */
+  border-color: #2a3a52;        /* was #243248 */
+  color: #cfe1f6;               /* was #a7bed2 */
 }
 
-.meter {
-    display: flex;
-    flex-direction: column;
-    gap: 10px
-}
-
-.row {
-    display: grid;
-    grid-template-columns: 96px 1fr 56px;
-    align-items: center;
-    gap: 10px
-}
-
-.label {
-    color: #cfe3f6;
-    font-size: 14px
-}
-
+/* 프로그레스 트랙/필: 트랙 더 밝게, 필 더 두껍고 선명하게 */
 .track {
-    height: 12px;
-    background: #0f1520;
-    border: 1px solid #243248;
-    border-radius: 999px;
-    overflow: hidden
+  background: #0f1724;          /* was #0f1520 */
+  border-color: #2a3a52;        /* was #243248 */
 }
-
 .fill {
-    height: 100%;
-    width: 0%;
-    background: var(--accent);
-    transition: width .25s ease
+  background: linear-gradient(90deg, #55acff, #2f86ff);  /* 같은 톤에서 밝기 ↑ */
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
 }
 
-.val {
-    font-variant-numeric: tabular-nums;
-    text-align: right;
-    color: #b8cbe0
-}
+/* 로그 가독성 ↑ */
+.log { color: #c4d5e8; }
 
-.log {
-    font-family: ui-monospace, Menlo, Consolas, monospace;
-    color: #a7bed2;
-    font-size: 12px;
-    white-space: pre-wrap;
-    line-height: 1.5
-}
-
-@media (max-width:920px) {
-    .grid {
-        grid-template-columns: 1fr
-    }
-}
+/* 호버 피드백 추가 (살짝 띄우기) */
+.card:hover { transform: translateY(-3px); transition: transform .18s ease; }
