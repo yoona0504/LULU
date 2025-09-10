@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}감정 분석{% endblock %}
+{% block head %}
+  <style>
+    .rowbar{display:flex; align-items:center; gap:.75rem; margin:.4rem 0;}
+    .track{flex:1; height:14px; background:#0f2038; border-radius:999px; overflow:hidden;}
+    .fill{height:100%; width:0%;}
+    .k{min-width:90px;}
+  </style>
+{% endblock %}
+{% block content %}
+  <h3 class="mb-3">감정 분석</h3>
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <div class="card p-3">
+        <h6>실시간 감정(최근 1개)</h6>
+        <div id="meters"></div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card p-3">
+        <h6>요약</h6>
+        <div id="summary" class="muted">계산 중…</div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script>
+let keys = null;
+function renderMeters(probs){
+  if(!probs) return;
+  if(!keys){ keys = Object.keys(probs); document.getElementById("meters").innerHTML =
+    keys.map(k=>`<div class="rowbar">
+      <div class="k">${k}</div>
+      <div class="track"><div class="fill" id="f-${k}"></div></div>
+      <div class="v" id="v-${k}" style="min-width:48px; text-align:right;">0%</div>
+    </div>`).join("");
+  }
+  keys.forEach(k=>{
+    const p = Math.round((probs[k]||0)*100);
+    const f = document.getElementById(`f-${k}`);
+    const v = document.getElementById(`v-${k}`);
+    f.style.width = p+"%";
+    v.textContent = p+"%";
+  });
+}
+async function poll(){
+  const last = await (await fetch("/api/last")).json();
+  renderMeters(last.data?.probs || null);
+  const sum = await (await fetch("/api/summary")).json();
+  if(sum.ok){
+    const top = sum.top ? `우세 감정: <b>${sum.top}</b>` : "우세 감정: -";
+    const means = sum.means ? Object.entries(sum.means).map(([k,v])=>`${k}: ${(v*100).toFixed(0)}%`).join(" · ") : "";
+    document.getElementById("summary").innerHTML = `${top}<br/><span class="muted">${means}</span>`;
+  }
+}
+setInterval(poll, 1500); poll();
+</script>
+{% endblock %}
