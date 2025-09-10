@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}성격 변화{% endblock %}
+{% block content %}
+  <h3 class="mb-3">루루봇 성격 변화</h3>
+  <div class="card p-3">
+    <p class="muted">최근 감정 평균을 Big5 느낌의 3축(친화·활력·안정)으로 매핑한 예시입니다. 실제 로직은 서버에서 자유롭게 고도화하세요.</p>
+    <div id="traits"></div>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script>
+function mapToTraits(means){
+  // 예시: 감정 → 성격 지표 가중치
+  const w = {
+    happy:{aff:0.7, ene:0.6, calm:0.2},
+    neutral:{aff:0.3, ene:0.2, calm:0.6},
+    sad:{aff:0.1, ene:0.1, calm:0.8},
+    angry:{aff:0.0, ene:0.7, calm:0.1},
+    fear:{aff:0.0, ene:0.4, calm:0.1},
+    disgust:{aff:0.0, ene:0.3, calm:0.1},
+    surprise:{aff:0.4, ene:0.8, calm:0.2},
+  };
+  const keys = Object.keys(means||{});
+  let aff=0, ene=0, calm=0;
+  keys.forEach(k=>{
+    const p = means[k]||0;
+    const g = w[k] || {aff:0.2,ene:0.2,calm:0.2};
+    aff += p*g.aff; ene += p*g.ene; calm += p*g.calm;
+  });
+  const clamp = x=>Math.max(0, Math.min(1, x));
+  return {친화도:clamp(aff), 활력:clamp(ene), 안정감:clamp(calm)};
+}
+function bars(obj){
+  return Object.entries(obj).map(([k,v])=>`
+    <div class="mb-2">${k}</div>
+    <div class="progress mb-3">
+      <div class="progress-bar" role="progressbar" style="width:${(v*100).toFixed(0)}%">${(v*100).toFixed(0)}%</div>
+    </div>`).join("");
+}
+async function tick(){
+  const sum = await (await fetch("/api/summary")).json();
+  const traits = mapToTraits(sum.means||{});
+  document.getElementById("traits").innerHTML = bars(traits);
+}
+setInterval(tick, 2000); tick();
+</script>
+{% endblock %}
