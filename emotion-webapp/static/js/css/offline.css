@@ -1,0 +1,6 @@
+/* 오프라인 대응 페이지 전용 스타일 */
+#avg {
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
+}
