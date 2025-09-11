@@ -1,0 +1,50 @@
+/* === Quick Theme Lift === */
+:root { --cam-max: 560px; }
+
+.page-title{ font-weight:800; letter-spacing:-.3px; }
+
+.dashboard-grid{
+  display:grid; gap:16px;
+  grid-template-columns:minmax(280px, var(--cam-max)) 1fr;
+}
+@media (max-width: 992px){
+  .dashboard-grid{ grid-template-columns:1fr; }
+}
+
+/* 카드(전역 톤은 styles.css에서, face 페이지에서 필요한 보정만 여기에) */
+.card .card-header{ border-bottom-color:#26354a; color:#eaf2ff; }
+.muted{ color:#9fb1c5; }
+
+/* 카메라 */
+.cam-wrap{
+  width:100%;
+  max-width: var(--cam-max);
+  border-radius:12px;
+  overflow:hidden;
+  background:#0b1220;
+  aspect-ratio: 4/3;
+}
+.cam-wrap img{ width:100%; display:block; }
+
+/* 가로 그래프 */
+.meter-row{
+  display:grid;
+  grid-template-columns: 120px 1fr 52px;
+  gap:12px; align-items:center;
+  margin:10px 0;
+}
+.meter-row .label{ color:#9fb1c5; font-weight:600; text-transform:capitalize; }
+.track{ position:relative; height:10px; background:#0d1a2b; border-radius:999px; overflow:hidden; }
+.fill{ position:absolute; inset:0; width:0%; transition:width .25s ease; background:#4da3ff; }
+.pct{ text-align:right; color:#cfe1ff; font-variant-numeric:tabular-nums; }
+
+/* 로그 */
+.log-box{
+  height:180px;
+  font-size:.9rem;
+  font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  background:#0b1220; color:#cfe1ff;
+}
+
+/* “라이브 카메라” 제목 색만 별도로 주고 싶으면 여기서 */
+.card-header strong { color:#4da3ff; }
