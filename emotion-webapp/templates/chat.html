@@ -1,33 +1,31 @@
 {% extends "base.html" %}
-{% block title %}오프라인 대응{% endblock %}
-{% block content %}
-  <h3 class="mb-3">오프라인 대응</h3>
-  <div class="row g-3">
-    <div class="col-lg-6">
-      <div class="card p-3">
-        <h6>감정별 로컬 반응(예시)</h6>
-        <ul class="mb-0">
-          <li>happy → 춤추기/LED 밝게</li>
-          <li>sad → 위로 멘트/LED 잔잔</li>
-          <li>angry → 진정 멘트/거리두기 모션</li>
-        </ul>
-        <p class="muted mt-2 mb-0">하드웨어 제어 함수에 매핑하세요.</p>
-      </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="card p-3">
-        <h6>최근 평균</h6>
-        <pre id="avg" class="muted" style="white-space:pre-wrap;"></pre>
-      </div>
-    </div>
-  </div>
+{% block title %}AI 대화{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
 {% endblock %}
+
+{% block content %}
+<h3 class="mb-3">AI 대화</h3>
+
+<div class="chat-card card p-3">
+  <div class="chat-toolbar d-flex justify-content-between align-items-center mb-2">
+    <label class="form-check-label">
+      <input id="useEmotion" class="form-check-input" type="checkbox" checked>
+      감정 컨텍스트 사용
+    </label>
+    <span class="muted small" id="ctxInfo">컨텍스트: 불러오는 중…</span>
+  </div>
+
+  <div id="chatLog" class="chat-log mb-2"></div>
+
+  <div class="chat-input-row">
+    <textarea id="msg" class="form-control" rows="2" placeholder="메시지를 입력하세요"></textarea>
+    <button id="send" class="btn btn-primary">보내기</button>
+  </div>
+</div>
+{% endblock %}
+
 {% block scripts %}
-<script>
-async function tick(){
-  const s = await (await fetch("/api/summary")).json();
-  document.getElementById("avg").textContent = JSON.stringify(s.means || {}, null, 2);
-}
-setInterval(tick, 2000); tick();
-</script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 {% endblock %}

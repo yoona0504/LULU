@@ -45,6 +45,3 @@
   font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   background:#0b1220; color:#cfe1ff;
 }
-
-/* “라이브 카메라” 제목 색만 별도로 주고 싶으면 여기서 */
-.card-header strong { color:#4da3ff; }
