@@ -1,3 +1,5 @@
+from flask import request  # ← 추가
+import os                 # ← (OpenAI 키 감지용, 없어도 됨)
 import time
 import cv2
 from collections import deque
@@ -260,6 +262,43 @@ def api_summary():
     means = {k: (sums[k] / n) for k in keys}
     top = max(means, key=means.get)
     return jsonify(ok=True, total=n, top=top, means=means)
+
+def _fallback_reply(user_msg: str, emotion=None) -> str:
+    emo = ""
+    if isinstance(emotion, dict) and emotion.get("top"):
+        emo = f"(현재 우세 감정: {emotion['top']}) "
+    return f"{emo}{user_msg}\n\n— 메시지 잘 받았어요! 로컬 폴백 응답입니다."
+
+@app.post("/api/chat")
+def api_chat():
+    data = request.get_json(silent=True) or {}
+    user_msg = (data.get("message") or "").strip()
+    emotion = (data.get("context") or {}).get("emotion")
+    if not user_msg:
+        return jsonify({"ok": False, "error": "empty_message"}), 400
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if api_key:
+        try:
+            from openai import OpenAI
+            client = OpenAI(api_key=api_key)
+            sys_prompt = "You are a friendly robot pet. Reply concisely in Korean."
+            if emotion:
+                sys_prompt += f"\n사용자 감정 컨텍스트: {emotion}"
+            resp = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role":"system","content":sys_prompt},
+                    {"role":"user","content":user_msg},
+                ],
+                temperature=0.7,
+            )
+            reply = resp.choices[0].message.content.strip()
+            return jsonify({"ok": True, "reply": reply})
+        except Exception:
+            pass  # 실패 시 폴백으로
+
+    return jsonify({"ok": True, "reply": _fallback_reply(user_msg, emotion)})
 
 
 # ======================================================
