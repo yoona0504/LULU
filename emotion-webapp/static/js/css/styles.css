@@ -1,0 +1,62 @@
+/* === Quick Theme Lift === */
+:root {
+  /* 기존보다 2~3스텝 밝게 */
+  --bg: #0f141d;     /* was #0b0f14 */
+  --card: #161e2b;   /* was #121822 */
+  --muted: #9fb1c5;  /* was #7d8a98 */
+  --accent: #4da3ff; /* 포인트 */
+}
+
+/* 전역 배경/문자색 (base.html 인라인 삭제분 반영) */
+body {
+  background: var(--bg);
+  color: #f0f6ff; /* was #e8eef5, 대비 살짝 ↑ */
+}
+
+/* 네비/링크(기존 base.html 인라인 반영) */
+.navbar { background:#0f1522; }
+a, .nav-link { color:#cfe3ff; }
+.brand { font-weight:800; letter-spacing:-0.3px; }
+.muted { color: var(--muted); }
+
+/* 카드(기존 인라인 + Lift 반영) */
+.card {
+  background: var(--card);
+  border: 1px solid #223047;        /* was #223049 */
+  box-shadow: 0 6px 24px rgba(0,0,0,.28);
+  transition: transform .18s ease;  /* hover 트랜지션 부드럽게 */
+}
+.card:hover { transform: translateY(-3px); }
+
+/* 카드 헤더 라인도 조금 더 선명하게 */
+.card .card-header {
+  border-bottom: 1px solid #26354a; /* was #1d2837 / #9fb1c5는 너무 밝으면 과함 */
+  color: #eaf2ff;
+}
+
+/* 라벨/텍스트 대비 상승 */
+.label { color: #e6f0fb; }      /* was #cfe3f6 */
+.val   { color: #d0def0; }      /* was #b8cbe0 */
+.hint  { color: #a9bdd2; }      /* was var(--muted)보다 살짝 선명 */
+
+/* 칩(필) 대비 상승 */
+.kv .pill {
+  background: #111a28;          /* was #0f1520 */
+  border-color: #2a3a52;        /* was #243248 */
+  color: #cfe1f6;               /* was #a7bed2 */
+}
+
+/* 프로그레스 트랙/필: 트랙 더 밝게, 필 더 두껍고 선명하게 */
+.track {
+  background: #0f1724;          /* was #0f1520 */
+  border-color: #2a3a52;        /* was #243248 */
+}
+.fill {
+  background: linear-gradient(90deg, #55acff, #2f86ff);  /* 같은 톤에서 밝기 ↑ */
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
+/* 로그 가독성 */
+.log, .log-box {
+  color: #c4d5e8;
+}
