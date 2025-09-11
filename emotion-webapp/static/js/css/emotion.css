@@ -1,0 +1,18 @@
+.rowbar{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  margin:.4rem 0;
+}
+.track{
+  flex:1;
+  height:14px;
+  background:#0f2038;
+  border-radius:999px;
+  overflow:hidden;
+}
+.fill{
+  height:100%;
+  width:0%;
+}
+.k{ min-width:90px; }
