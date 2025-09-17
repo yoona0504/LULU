@@ -2,7 +2,7 @@
 {% block title %}얼굴 인식{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/face.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/face.css') }}?v=9">
 {% endblock %}
 
 {% block content %}
@@ -70,7 +70,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/face.js') }}"></script>
+<script src="{{ url_for('static', filename='js/face.js') }}?v=9"></script>
 <script>
   const POLL_MS = 500;
   const preferredOrder = ["angry","disgust","fear","happy","sad","surprise","neutral"];
@@ -153,29 +153,35 @@
   }
 
   // 카메라 컨트롤
-  const cam = document.getElementById("cam");
-  const camBox = document.getElementById("camBox");
-  const camScale = document.getElementById("camScale");
-  const aspect = document.getElementById("aspect");
-  const camReset = document.getElementById("camReset");
+ // 카메라 컨트롤
+const camBox = document.getElementById("camBox");
+const camScale = document.getElementById("camScale");
+const aspect = document.getElementById("aspect");
+const camReset = document.getElementById("camReset");
+const root = document.documentElement; // CSS 변수 제어용
 
+// 초기값
+camBox.style.aspectRatio = "4/3";
+root.style.setProperty("--cam-max", "560px");
+
+// 슬라이더 → 박스 width (이미지는 100%라 자동 맞음)
+camScale.addEventListener("input", ()=>{
+  root.style.setProperty("--cam-max", camScale.value + "px");
+});
+
+// 종횡비 선택
+aspect.addEventListener("change", ()=>{
+  camBox.style.aspectRatio = aspect.value;
+});
+
+// 초기화 버튼
+camReset.addEventListener("click", ()=>{
+  camScale.value = 560;
+  root.style.setProperty("--cam-max", "560px");
+  aspect.value = "4/3";
   camBox.style.aspectRatio = "4/3";
-  cam.style.width = "560px";
+});
 
-  camScale.addEventListener("input", ()=>{
-    cam.style.width = Number(camScale.value) + "px";
-  });
-
-  aspect.addEventListener("change", ()=>{
-    camBox.style.aspectRatio = aspect.value;
-  });
-
-  camReset.addEventListener("click", ()=>{
-    camScale.value = 560;
-    cam.style.width = "560px";
-    aspect.value = "4/3";
-    camBox.style.aspectRatio = "4/3";
-  });
 
   tick();
 </script>
