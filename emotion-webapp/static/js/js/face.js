@@ -1,49 +1,55 @@
-// ========= DOM refs =========
-const sizeRange = document.getElementById('sizeRange');
-const aspectSelect = document.getElementById('aspectSelect');
-const html = document.documentElement;
+// ========= DOM refs  =========
+const sizeRange    = document.getElementById('sizeRange')    || document.getElementById('camScale');
+const aspectSelect = document.getElementById('aspectSelect') || document.getElementById('aspect');
+const html   = document.documentElement;
 const camBox = document.getElementById('camBox');
 
-const emotionList = document.getElementById('emotionList');
+const metersEl     = document.getElementById('meters')       || document.getElementById('emotionList');
 const topEmotionEl = document.getElementById('topEmotion');
-const topScoreEl = document.getElementById('topScore');
-const fpsEl = document.getElementById('fps');
-const engineEl = document.getElementById('engineName');
-const logEl = document.getElementById('log');
-const clearBtn = document.getElementById('clearLog');
+const topScoreEl   = document.getElementById('topScore')     || document.getElementById('confidence');
+const fpsEl        = document.getElementById('fps');
+const engineEl     = document.getElementById('engineName')   || document.getElementById('engine');
+const logEl        = document.getElementById('log');
+const clearBtn     = document.getElementById('clearLog');
 
-clearBtn?.addEventListener('click', () => (logEl.textContent = ''));
+clearBtn?.addEventListener('click', () => {
+  if (!logEl) return;
+  if (logEl.tagName === 'TEXTAREA' || logEl.tagName === 'INPUT') logEl.value = '';
+  else logEl.textContent = '';
+});
 
-// ========= 카메라 크기/종횡비 =========
+// ========= 카메라 크기/종횡비 (변수명/속성 모두 갱신: 캐시/스타일 차이 대비) =========
 function applySize(px) {
-  html.style.setProperty('--cam-max-width', `${px}px`);
-  camBox.style.maxWidth = `var(--cam-max-width)`;
+  const v = `${px}px`;
+  html.style.setProperty('--cam-max', v);  // ← 이 변수로 통일
+  if (camBox) { camBox.style.width = v; }  // ← fallback (확실하게 적용)
 }
 function applyAspect(ratio) {
-  html.style.setProperty('--cam-aspect', ratio);
-  camBox.style.aspectRatio = `var(--cam-aspect)`;
+  if (camBox) camBox.style.aspectRatio = ratio;
 }
 
+// 초기값
 applySize(520);
 applyAspect('4/3');
 
+// 컨트롤 이벤트
 sizeRange?.addEventListener('input', () => applySize(Number(sizeRange.value)));
 aspectSelect?.addEventListener('change', () => applyAspect(aspectSelect.value));
 
-// ========= 감정 막대 =========
+// ========= 감정 막대 (face.css의 .meter-row / .track / .fill / .pct 구조에 맞춤) =========
 const EMOTION_KEYS = ["angry","disgust","fear","happy","sad","surprise","neutral"];
 
 function ensureBars() {
-  if (emotionList.children.length) return;
+  if (!metersEl || metersEl.children.length) return;
   EMOTION_KEYS.forEach((k) => {
     const row = document.createElement('div');
-    row.className = 'row';
+    row.className = 'meter-row';
     row.innerHTML = `
       <div class="label text-capitalize">${k}</div>
-      <div class="track"><div class="fill" id="bar-${k}"></div></div>
-      <div class="val" id="val-${k}">0%</div>
+      <div class="track"><div class="fill" id="fill-${k}"></div></div>
+      <div class="pct" id="pct-${k}">0%</div>
     `;
-    emotionList.appendChild(row);
+    metersEl.appendChild(row);
   });
 }
 ensureBars();
@@ -72,22 +78,24 @@ setInterval(poll, POLL_MS);
 function updateUI(data) {
   if (!data) return;
 
-  if (data.engine) engineEl.textContent = `엔진: ${data.engine}`;
-  if (typeof data.fps === 'number') fpsEl.textContent = `FPS: ${data.fps.toFixed(1)}`;
+  if (engineEl && data.engine) engineEl.textContent = engineEl.id === 'engineName' ? `엔진: ${data.engine}` : data.engine;
+
+  if (fpsEl && typeof data.fps === 'number')
+    fpsEl.textContent = (fpsEl.id === 'fps' && engineEl?.id === 'engineName') ? `FPS: ${data.fps.toFixed(1)}` : data.fps.toFixed(1);
 
   const probs = data.emotions || data.probs || {};
   EMOTION_KEYS.forEach((k) => {
     const v = Math.max(0, Math.min(1, Number(probs[k] ?? 0)));
     const pct = Math.round(v * 100);
-    const bar = document.getElementById(`bar-${k}`);
-    const val = document.getElementById(`val-${k}`);
-    if (bar) bar.style.width = pct + '%';
-    if (val) val.textContent = pct + '%';
+    const fill = document.getElementById(`fill-${k}`);
+    const pctEl = document.getElementById(`pct-${k}`);
+    if (fill)  fill.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
   });
 
   if (data.top && data.top.label) {
-    topEmotionEl.textContent = data.top.label;
-    topScoreEl.textContent =
+    if (topEmotionEl) topEmotionEl.textContent = data.top.label;
+    if (topScoreEl)   topScoreEl.textContent =
       typeof data.top.score === 'number' ? Math.round(data.top.score * 100) + '%' : '-';
   } else {
     // top이 없을 때 최대값 계산
@@ -96,13 +104,16 @@ function updateUI(data) {
       const n = Number(v) || 0;
       if (n > bestV) { bestV = n; bestK = k; }
     }
-    topEmotionEl.textContent = bestK;
-    topScoreEl.textContent = Math.round(bestV * 100) + '%';
+    if (topEmotionEl) topEmotionEl.textContent = bestK;
+    if (topScoreEl)   topScoreEl.textContent = Math.round(bestV * 100) + '%';
   }
 }
 
 // ========= 로그 =========
 function pushLog(msg) {
+  if (!logEl) return;
   const t = new Date().toLocaleTimeString();
-  logEl.textContent = `[${t}] ${msg}\n` + logEl.textContent;
+  const line = `[${t}] ${msg}\n`;
+  if (logEl.tagName === 'TEXTAREA' || logEl.tagName === 'INPUT') logEl.value = line + (logEl.value || '');
+  else logEl.textContent = line + (logEl.textContent || '');
 }
