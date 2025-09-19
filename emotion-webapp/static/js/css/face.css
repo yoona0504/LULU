@@ -16,7 +16,7 @@
 
 /* 카메라: 래퍼 자체를 변수로 제어 */
 .cam-wrap{
-  width: var(--cam-max);
+   width: var(--cam-max) !important;  /* ← 우선순위 충돌 차단 */
   border-radius:12px;
   overflow:hidden;
   background:#0b1220;
