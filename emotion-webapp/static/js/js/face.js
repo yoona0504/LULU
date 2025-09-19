@@ -3,6 +3,7 @@ const sizeRange    = document.getElementById('sizeRange')    || document.getElem
 const aspectSelect = document.getElementById('aspectSelect') || document.getElementById('aspect');
 const html   = document.documentElement;
 const camBox = document.getElementById('camBox');
+const grid = document.querySelector('.dashboard-grid');
 
 const metersEl     = document.getElementById('meters')       || document.getElementById('emotionList');
 const topEmotionEl = document.getElementById('topEmotion');
@@ -11,6 +12,10 @@ const fpsEl        = document.getElementById('fps');
 const engineEl     = document.getElementById('engineName')   || document.getElementById('engine');
 const logEl        = document.getElementById('log');
 const clearBtn     = document.getElementById('clearLog');
+
+// 중복 실행 방지 (외부+인라인 동시 로드, 또는 두 번 import될 때)
+if (!logEl) return;
+window.__faceinit = true;
 
 clearBtn?.addEventListener('click', () => {
   if (!logEl) return;
@@ -23,14 +28,17 @@ function applySize(px) {
   const v = `${px}px`;
   html.style.setProperty('--cam-max', v);  // ← 이 변수로 통일
   if (camBox) { camBox.style.width = v; }  // ← fallback (확실하게 적용)
+  if (grid) { grid.style.gridTemplateColumns = `minmax(280px, ${v}) 1fr`; }
 }
 function applyAspect(ratio) {
   if (camBox) camBox.style.aspectRatio = ratio;
 }
 
-// 초기값
-applySize(520);
-applyAspect('4/3');
+// 초기값: 슬라이더 현재값을 사용 + 스타일 계산 이후에 1프레임 뒤 적용
+requestAnimationFrame(() => {
+  applySize(Number((sizeRange && sizeRange.value) || 560));
+  applyAspect((aspectSelect && aspectSelect.value) || '4/3');
+});
 
 // 컨트롤 이벤트
 sizeRange?.addEventListener('input', () => applySize(Number(sizeRange.value)));
