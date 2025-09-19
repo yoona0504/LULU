@@ -2,12 +2,14 @@
 :root { --cam-max: 560px; }
 
 /* 레이아웃 */
-.dashboard-grid{
-  display:grid; gap:16px;
-  grid-template-columns:minmax(280px, var(--cam-max)) 1fr;
+.face-grid{
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(300px, var(--cam-max, 560px)) 1fr;
+  align-items: start;
 }
 @media (max-width: 992px){
-  .dashboard-grid{ grid-template-columns:1fr; }
+  .face-grid{ grid-template-columns: 1fr; }
 }
 
 /* 카드(전역 톤은 styles.css에서, face 페이지에서 필요한 보정만 여기에) */
@@ -16,7 +18,7 @@
 
 /* 카메라: 래퍼 자체를 변수로 제어 */
 .cam-wrap{
-   width: var(--cam-max) !important;  /* ← 우선순위 충돌 차단 */
+  width: var(--cam-max);
   border-radius:12px;
   overflow:hidden;
   background:#0b1220;
