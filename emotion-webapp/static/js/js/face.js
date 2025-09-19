@@ -3,7 +3,7 @@ const sizeRange    = document.getElementById('sizeRange')    || document.getElem
 const aspectSelect = document.getElementById('aspectSelect') || document.getElementById('aspect');
 const html   = document.documentElement;
 const camBox = document.getElementById('camBox');
-const grid = document.querySelector('.dashboard-grid');
+const grid = document.querySelector('.face-grid');
 
 const metersEl     = document.getElementById('meters')       || document.getElementById('emotionList');
 const topEmotionEl = document.getElementById('topEmotion');
