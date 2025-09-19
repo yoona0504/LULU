@@ -2,73 +2,81 @@
 {% block title %}얼굴 인식{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/face.css') }}?v=9">
+  <!-- 페이지 전용 스타일 -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/face.css') }}?">
 {% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-end justify-content-between mb-3">
-  <h3 class="page-title mb-0">얼굴 인식</h3>
-  <div class="muted small">카메라 LED가 켜져 있으면 다른 앱이 점유 중일 수 있어요</div>
-</div>
-
-<div class="dashboard-grid">
-  <div class="card">
-    <div class="card-header d-flex justify-content-between">
-      <strong>라이브 카메라</strong>
-      <span class="muted small">엔진: <span id="engine">{{ engine }}</span> · FPS: <span id="fps">–</span></span>
-    </div>
-    <div class="card-body">
-      <div class="cam-wrap" id="camBox">
-        <img id="cam" src="/video_feed" alt="camera stream">
-      </div>
-      <div class="d-flex align-items-center gap-3 mt-3">
-        <label class="muted small" for="camScale">카메라 크기</label>
-        <input type="range" id="camScale" class="form-range" min="320" max="900" value="560">
-        <select id="aspect" class="form-select form-select-sm">
-          <option value="4/3" selected>4:3</option>
-          <option value="16/9">16:9</option>
-          <option value="1/1">1:1</option>
-        </select>
-        <button id="camReset" class="btn btn-sm btn-outline-light">초기화</button>
-      </div>
-    </div>
+  <div class="d-flex align-items-end justify-content-between mb-3">
+    <h3 class="page-title mb-0">얼굴 인식</h3>
+    <div class="muted small">카메라 LED가 켜져 있으면 다른 앱이 점유 중일 수 있어요</div>
   </div>
 
-  <div class="d-grid gap-3">
+  <div class="face-grid">
+    <!-- 왼쪽: 카메라 -->
     <div class="card">
-      <div class="card-header"><strong>분석 결과</strong></div>
-      <div class="card-body"><div id="meters"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><strong>현재 상태</strong></div>
+      <div class="card-header d-flex justify-content-between">
+        <strong>라이브 카메라</strong>
+        <span class="muted small">
+          엔진: <span id="engine">{{ engine }}</span> · FPS: <span id="fps">–</span>
+        </span>
+      </div>
       <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <div class="muted small">주 감정</div>
-            <div id="topEmotion" class="fs-4 fw-bold text-capitalize">-</div>
-          </div>
-          <div class="col-md-6">
-            <div class="muted small">신뢰도</div>
-            <div id="confidence" class="fs-4 fw-bold">0%</div>
-          </div>
+        <div class="cam-wrap" id="camBox" aria-label="camera container">
+          <img id="cam" src="/video_feed" alt="camera stream">
+        </div>
+
+        <div class="d-flex align-items-center gap-3 mt-3">
+          <label class="muted small" for="camScale">카메라 크기</label>
+          <input type="range" id="camScale" class="form-range" min="320" max="900" value="560" />
+          <select id="aspect" class="form-select form-select-sm" aria-label="aspect ratio">
+            <option value="4/3" selected>4:3</option>
+            <option value="16/9">16:9</option>
+            <option value="1/1">1:1</option>
+          </select>
+          <button id="camReset" class="btn btn-sm btn-outline-light" type="button">초기화</button>
         </div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <strong>로그</strong>
-        <button id="clearLog" class="btn btn-sm btn-outline-light">지우기</button>
+    <!-- 오른쪽: 분석/상태/로그 -->
+    <div class="d-grid gap-3">
+      <div class="card">
+        <div class="card-header"><strong>분석 결과</strong></div>
+        <div class="card-body">
+          <div id="meters" aria-live="polite"></div>
+        </div>
       </div>
-      <div class="card-body">
-        <textarea id="log" class="form-control log-box" readonly></textarea>
+
+      <div class="card">
+        <div class="card-header"><strong>현재 상태</strong></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="muted small">주 감정</div>
+              <div id="topEmotion" class="fs-4 fw-bold text-capitalize">-</div>
+            </div>
+            <div class="col-md-6">
+              <div class="muted small">신뢰도</div>
+              <div id="confidence" class="fs-4 fw-bold">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong>로그</strong>
+          <button id="clearLog" class="btn btn-sm btn-outline-light" type="button">지우기</button>
+        </div>
+        <div class="card-body">
+          <textarea id="log" class="form-control log-box" readonly aria-label="log"></textarea>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/face.js') }}?v=9"></script>
+  <script src="{{ url_for('static', filename='js/face.js') }}?v=9"></script>
 {% endblock %}
