@@ -3,7 +3,6 @@ cd C:\LULU\emotion-webapp
 .\.venv\Scripts\activate
 
 // *emotion-webapp* 에서 pip install -r requirements.txt
-
 python app.py
 
 
