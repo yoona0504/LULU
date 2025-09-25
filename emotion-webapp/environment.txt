@@ -3,3 +3,5 @@ cd C:\LULU
 
 cd emotion-webapp
 python app.py
+
+// cd emotion-webapp 에서 pip install -r requirements.txt
