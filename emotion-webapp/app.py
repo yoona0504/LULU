@@ -14,6 +14,7 @@ app = Flask(__name__)
 # - FER이 특정 감정을 반환하지 않거나 값이 비정상일 때를 대비
 # - 항상 7개 감정 키를 채워서 반환하도록 보정
 # - 값 범위를 [0,1]로 클램프, 합계가 0이면 neutral=1.0
+# - ★ 합계가 0이 아니면 1로 정규화(프런트 퍼센트 표시 안정)
 # ======================================================
 ALL7 = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
 
@@ -24,10 +25,13 @@ def _complete7(d: dict) -> dict:
         if v < 0: v = 0.0
         if v > 1: v = 1.0
         out[k] = v
-    if sum(out.values()) == 0.0:
+    s = sum(out.values())
+    if s == 0.0:
+        out = {k: 0.0 for k in ALL7}
         out["neutral"] = 1.0
-    return out
-
+        return out
+    # ★ 정규화
+    return {k: (out[k] / s) for k in ALL7}
 
 # ======================================================
 # 카메라 초기화
@@ -35,7 +39,6 @@ def _complete7(d: dict) -> dict:
 cap = cv2.VideoCapture(0)  # 외장 카메라면 1 또는 2로 변경
 if not cap.isOpened():
     raise RuntimeError("웹캠을 열 수 없습니다. 카메라 연결을 확인하세요.")
-
 
 # ======================================================
 # 감정 엔진 선택
@@ -52,14 +55,12 @@ else:
     predictor = HeuristicEmotion()
     ENGINE_NAME = "heuristic"
 
-
 # ======================================================
 # 얼굴 탐지기 (휴리스틱 전용)
 # ======================================================
 face_cascade = cv2.CascadeClassifier(
     cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
 )
-
 
 # ======================================================
 # 공유 상태 (대시보드용)
@@ -77,11 +78,10 @@ last_time = time.time()
 HIST_MAX = 200
 emotion_hist = deque(maxlen=HIST_MAX)
 
-
 # ======================================================
 # 유틸 함수
 # ======================================================
-def _now_ms(): 
+def _now_ms():
     return int(time.time() * 1000)
 
 def _push_emotion_sample(probs: dict):
@@ -113,7 +113,6 @@ def _current_fps():
     if not fps_ma:
         return 0.0
     return sum(fps_ma) / len(fps_ma)
-
 
 # ======================================================
 # 비디오 프레임 생성 제너레이터
@@ -172,7 +171,6 @@ def gen_frames():
             b"Content-Type: image/jpeg\r\n\r\n" + buffer.tobytes() + b"\r\n"
         )
 
-
 # ======================================================
 # 페이지 라우트 (멀티페이지 구성)
 # ======================================================
@@ -200,16 +198,16 @@ def chat_page():
 def offline_page():
     return render_template("offline.html", engine=ENGINE_NAME)
 
-
 # ======================================================
 # API 엔드포인트
 # ------------------------------------------------------
-# - /video_feed : 카메라 MJPEG 스트림
-# - /api/ping   : 서버 헬스체크
-# - /api/emotion: 최근 감정 1개 + fps (7키 보정 적용)
-# - /api/last   : 최근 1개 기록 반환
-# - /api/history: 최근 N개 기록 반환
-# - /api/summary: 평균 통계 요약 반환
+# - /video_feed      : 카메라 MJPEG 스트림
+# - /api/ping        : 서버 헬스체크
+# - /api/emotion     : 최근 감정 1개 + fps (7키 보정 적용)
+# - /api/face_state  : ★ 프런트 폴링용 (label/score/probs만 축약)
+# - /api/last        : 최근 1개 기록 반환
+# - /api/history     : 최근 N개 기록 반환
+# - /api/summary     : 최근 평균 통계 요약 반환
 # ======================================================
 @app.route("/video_feed")
 def video_feed():
@@ -235,6 +233,20 @@ def api_emotion():
     # 참고 로그
     print("[ENGINE]", ENGINE_NAME, "->", predictor.__class__.__name__)
     return resp
+
+# ★ 프런트에서 간단히 쓰기 위한 축약 API (주감정/신뢰도/분포)
+@app.route("/api/face_state")
+def api_face_state():
+    probs7 = _complete7(last_emotions)
+    label = max(probs7, key=probs7.get)
+    score = float(probs7[label])
+    stale = (time.time() - last_time) > 2.0
+    return jsonify({
+        "ok": (not stale),
+        "label": label,
+        "score": round(score, 4),
+        "probs": probs7
+    })
 
 @app.route("/api/last")
 def api_last():
@@ -300,6 +312,18 @@ def api_chat():
 
     return jsonify({"ok": True, "reply": _fallback_reply(user_msg, emotion)})
 
+# ======================================================
+# 정적 파일 캐싱 방지 (개발 중 항상 최신 JS/CSS 로드되도록)
+# - 브라우저/프록시 캐시 무효화
+# - 배포 시에는 제거하거나 수정 권장
+# ======================================================
+# ★ 중복 데코레이터 제거 (기존에 @app.after_request 두 번 달려 있었음)
+@app.after_request
+def add_no_cache_headers(resp):
+    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    return resp
 
 # ======================================================
 # 실행부
