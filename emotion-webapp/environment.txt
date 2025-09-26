@@ -2,7 +2,7 @@ cd C:\LULU\emotion-webapp
 // 가상환경 없을 시 python -m venv .venv
 .\.venv\Scripts\activate
 
-// *emotion-webapp* 에서 pip install -r requirements.txt
+// *emotion-webapp* 에서 pip install -r requirements.txt // 설치 안 했을 때만
 python app.py
 
 
